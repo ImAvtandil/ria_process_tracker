@@ -18,7 +18,8 @@
 -export([
   start_process/2,
   start_process/3,
-  stop_process/2
+  stop_process/2,
+  find_process/2
 ]).
 
 %% gen_server callbacks
@@ -58,6 +59,8 @@ start_process(TrackerName, ChildName, Options) ->
 stop_process(TrackerName, ChildName) ->
   gen_server:cast(TrackerName, {stop_process, ChildName}).
 
+find_process(TrackerName, Id)->
+  gen_server:call(TrackerName,{find_process, Id}).
 %%--------------------------------------------------------------------
 %% @doc
 %% Starts the server
@@ -109,6 +112,13 @@ handle_call({make_process, ChildName, Options}, _From, State) ->
         end,
 
   {reply, {ok, Pid}, State};
+
+handle_call({find_process, Id}, _From, State) ->
+  case ets:lookup(State#state.name, Id) of
+    [] ->{reply, {ok,none}, State};
+    [#process_entry{pid = Pid}] ->{reply, {ok, Pid}, State}
+  end;
+
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
