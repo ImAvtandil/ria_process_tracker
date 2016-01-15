@@ -12,7 +12,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -36,8 +36,8 @@
 %%
 %% @end
 %%--------------------------------------------------------------------
-start_link() ->
-  gen_server:start_link(?MODULE, [], []).
+start_link(Options) ->
+  gen_server:start_link(?MODULE, [Options], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -54,7 +54,7 @@ start_link() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([]) ->
+init([_]) ->
   {ok, #state{}}.
 
 %%--------------------------------------------------------------------

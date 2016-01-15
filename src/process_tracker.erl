@@ -17,6 +17,7 @@
 -export([start_link/1]).
 -export([
   start_process/2,
+  start_process/3,
   stop_process/2
 ]).
 
@@ -48,7 +49,10 @@
 
 %% process_tracker:start_process(default_tracker, "Start").
 start_process(TrackerName, ChildName) ->
-  gen_server:call(TrackerName, {make_process, ChildName}).
+  gen_server:call(TrackerName, {make_process, ChildName, []}).
+
+start_process(TrackerName, ChildName, Options) ->
+  gen_server:call(TrackerName, {make_process, ChildName, Options}).
 
 %% process_tracker:stop_process(default_tracker, "Start").
 stop_process(TrackerName, ChildName) ->
@@ -91,12 +95,12 @@ init([{Name, Supervisor, Function}]) ->
 %% @end
 %%--------------------------------------------------------------------
 
-handle_call({make_process, ChildName}, _From, State) ->
+handle_call({make_process, ChildName, Options}, _From, State) ->
   Supervisor = State#state.supervisor,
   Function = State#state.function,
   Pid = case ets:lookup(State#state.name, ChildName) of
           [] ->
-            {ok, Pid_} = Supervisor:Function(),
+            {ok, Pid_} = Supervisor:Function(Options),
             Ref = erlang:monitor(process, Pid_),
             ets:insert(State#state.name, #process_entry{id = ChildName, ref = Ref, pid = Pid_}),
             Pid_;

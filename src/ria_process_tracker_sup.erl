@@ -5,15 +5,15 @@
 -export([init/1]).
 -export([
   make_specs/2,
-  start_child/0
+  start_child/1
 ]).
 
 start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 
-start_child() ->
-  supervisor:start_child(example_sup, []).
+start_child(Options) ->
+  supervisor:start_child(example_sup, [Options]).
 
 init([example])->
   Children =
